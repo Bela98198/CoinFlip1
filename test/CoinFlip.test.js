@@ -169,20 +169,29 @@ describe("CoinFlip contract: ", function () {
             await expect(coinFlip.connect(accounts.caller).takeProfit())
                 .to.be.revertedWith("Only the")
         })
+
         //it("Should revert with msg HouseProfitEther is negative", async () => {
         //await coinFlip.houseProfitEther
         //})
 
         it("Should transfer profit to ProfitTaker", async () => {
-            const houseProfitEther =  await coinFlip.houseProfitEther ();
+            const houseProfitEther = await coinFlip.houseProfitEther();
             await expect(await coinFlip.takeProfit())
-                .to.changeEtherBalances([coinFlip , accounts.deployer], [houseProfitEther.mul(ethers.constants.NegativeOne), houseProfitEther]);
+                .to.changeEtherBalances([coinFlip, accounts.deployer], [houseProfitEther.mul(ethers.constants.NegativeOne), houseProfitEther]);
+        })
+    })
+
+    describe("Function withdraw", async () => {
+        it("Should withdraw balance of contract", async () => {
+            const houseProfitEther = await coinFlip.houseProfitEther();
+            const balanceContract = await ethers.provider.getBalance(coinFlip.address)
+            await expect(await coinFlip.withdraw())
+                .to.changeEtherBalances([coinFlip, accounts.deployer], [balanceContract.sub(houseProfitEther).mul(ethers.constants.NegativeOne), balanceContract.sub(houseProfitEther)])
         })
     })
 })
 
-
-//withdraw u confirm ( mi angam haxtel mi angam partvi u mi hate event uni )
+// confirm ( mi angam haxtel mi angam partvi u mi hate event uni )
 
 
 
