@@ -27,7 +27,7 @@ describe("CoinFlip contract: ", function () {
             expect(await coinFlip.WIN_COEFFICIENT()).to.equal(195);
             expect(await coinFlip.minEtherBet()).to.equal(ethers.utils.parseEther("0.1"));
             expect(await coinFlip.maxEtherBet()).to.equal(ethers.utils.parseEther("10"));
-            // expect(await coinFlip.WIN_COEFFICIENT()).to.equal(195);
+            //expect(await coinFlip.WIN_COEFFICIENT()).to.equal(195);
         })
     })
 
@@ -65,7 +65,6 @@ describe("CoinFlip contract: ", function () {
             await coinFlip.connect(accounts.caller).play(choice, seed, {
                 value: betAmount
             })
-
 
             //console.log("CurrentGame", currentGame)
 
@@ -109,6 +108,7 @@ describe("CoinFlip contract: ", function () {
         })
     })
 
+
     describe("Function confirm", async () => {
         it("Should revert with  msg Game already played", async () => {
             const seed = ethers.utils.formatBytes32String("game2");
@@ -125,8 +125,59 @@ describe("CoinFlip contract: ", function () {
             const privateKey = "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d";
             const signature = await web3.eth.accounts.sign(seed, privateKey)
 
-            await expect(coinFlip.connect(accounts.deployer).confirm(seed, signature.v, signature.r, signature.s))
+             await expect(coinFlip.connect(accounts.deployer).confirm(seed, signature.v, signature.r, signature.s))
                 .to.be.revertedWith('Invalid signature');
+
+        it("Game result when you win", async () => {
+            const seed = ethers.utils.formatBytes32String("game7");
+            const privateKey = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+            const signature = await web3.eth.accounts.sign(seed, privateKey)
+            const betAmount = ethers.utils.parseEther("0.2");
+            const choice = ethers.constants.Zero;
+            const winBet = 390000000000000000n
+
+                await coinFlip.connect(accounts.caller).play(choice, seed, { value: betAmount })
+                await expect(coinFlip.connect(accounts.deployer).confirm(seed, signature.v, signature.r, signature.s))
+                    .to
+                    .emit(coinFlip, 'GamePlayed')
+                    .withArgs(accounts.caller.address, betAmount, winBet, choice, 0, seed, 1);
+
+                const a = await coinFlip.games(seed)
+                console.log(a.toString())
+                expect(a[0]).to.equal(4);
+                expect(a[1]).to.equal(accounts.caller.address);
+                expect(a[2]).to.equal(betAmount);
+                expect(a[3]).to.equal(winBet);
+                expect(a[4]).to.equal(choice);
+                expect(a[5]).to.equal(0);
+                expect(a[6]).to.equal(1);
+
+            })
+
+        it("Game result when you lose", async () => {
+            const seed = ethers.utils.formatBytes32String("game8");
+            const privateKey = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+            const signature = await web3.eth.accounts.sign(seed, privateKey)
+            const betAmount = ethers.utils.parseEther("0.2");
+            const choice = ethers.constants.One;
+            const winBet = 0
+
+                await coinFlip.connect(accounts.caller).play(choice, seed, { value: betAmount })
+                await expect(coinFlip.connect(accounts.deployer).confirm(seed, signature.v, signature.r, signature.s))
+                    .to
+                    .emit(coinFlip, 'GamePlayed')
+                    .withArgs(accounts.caller.address, betAmount, winBet, choice, 0, seed, 2);
+
+                const b = await coinFlip.games(seed)
+
+                expect(b[0]).to.equal(5);
+                expect(b[1]).to.equal(accounts.caller.address);
+                expect(b[2]).to.equal(betAmount);
+                expect(b[3]).to.equal(winBet);
+                expect(b[4]).to.equal(choice);
+                expect(b[5]).to.equal(0);
+                expect(b[6]).to.equal(2);
+            })
         })
     })
 
@@ -158,6 +209,9 @@ describe("CoinFlip contract: ", function () {
         })
     })
 
+
+
+
     describe("Function setBetRange ", async () => {
         it("Should set the new minBet and maxBet values", async () => {
             await coinFlip.setBetRange(2, 25);
@@ -167,6 +221,7 @@ describe("CoinFlip contract: ", function () {
                 .to.equal(2);
         })
     })
+
 
     describe("Function setWinCoefficient ", async () => {
         it("Should set the new coficient", async () => {
@@ -194,7 +249,6 @@ describe("CoinFlip contract: ", function () {
 
 })
 
-// confirm ( mi angam haxtel mi angam partvi u mi hate event uni )
 
 
 
