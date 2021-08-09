@@ -130,39 +130,7 @@ describe("CoinFlip contract: ", function () {
         })
     })
 
-    xdescribe("Function setBetRange ", async () => {
-        it("Should set the new minBet and maxBet values", async () => {
-            await coinFlip.setBetRange(2, 25);
-            expect(await coinFlip.maxEtherBet())
-                .to.equal(25);
-            expect(await coinFlip.minEtherBet())
-                .to.equal(2);
-        })
-    })
 
-    xdescribe("Function setWinCoefficient ", async () => {
-        it("Should set the new coficient", async () => {
-            await coinFlip.setWinCoefficient(175);
-            expect(await coinFlip.WIN_COEFFICIENT())
-                .to.equal(175);
-        })
-    })
-
-    xdescribe("Function setCroupier", async () => {
-        it("Should set the new croupier", async () => {
-            await coinFlip.setCroupier(accounts.deployer.address);
-            expect(await coinFlip.croupier())
-                .to.equal(accounts.deployer.address)
-        })
-    })
-
-    xdescribe("Function setProfitTaker", async () => {
-        it("Should set the new profit taker", async () => {
-            await coinFlip.setProfitTaker(accounts.deployer.address)
-            expect(await coinFlip.profitTaker())
-                .to.equal(accounts.deployer.address)
-        })
-    })
 
     describe("Function takeProfit: ", async () => {
         it("Should revert with msg Only the", async () => {
@@ -184,11 +152,46 @@ describe("CoinFlip contract: ", function () {
     describe("Function withdraw", async () => {
         it("Should withdraw balance of contract", async () => {
             const houseProfitEther = await coinFlip.houseProfitEther();
-            const balanceContract = await ethers.provider.getBalance(coinFlip.address)
+            const balanceContract = await ethers.provider.getBalance(coinFlip.address)    //this is contract address 
             await expect(await coinFlip.withdraw())
                 .to.changeEtherBalances([coinFlip, accounts.deployer], [balanceContract.sub(houseProfitEther).mul(ethers.constants.NegativeOne), balanceContract.sub(houseProfitEther)])
         })
     })
+
+    describe("Function setBetRange ", async () => {
+        it("Should set the new minBet and maxBet values", async () => {
+            await coinFlip.setBetRange(2, 25);
+            expect(await coinFlip.maxEtherBet())
+                .to.equal(25);
+            expect(await coinFlip.minEtherBet())
+                .to.equal(2);
+        })
+    })
+
+    describe("Function setWinCoefficient ", async () => {
+        it("Should set the new coficient", async () => {
+            await coinFlip.setWinCoefficient(175);
+            expect(await coinFlip.WIN_COEFFICIENT())
+                .to.equal(175);
+        })
+    })
+
+    describe("Function setCroupier", async () => {
+        it("Should set the new croupier", async () => {
+            await coinFlip.setCroupier(accounts.deployer.address);
+            expect(await coinFlip.croupier())
+                .to.equal(accounts.deployer.address)
+        })
+    })
+
+    describe("Function setProfitTaker", async () => {
+        it("Should set the new profit taker", async () => {
+            await coinFlip.setProfitTaker(accounts.deployer.address)
+            expect(await coinFlip.profitTaker())
+                .to.equal(accounts.deployer.address)
+        })
+    })
+
 })
 
 // confirm ( mi angam haxtel mi angam partvi u mi hate event uni )
